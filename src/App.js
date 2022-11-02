@@ -9,17 +9,19 @@ async function digestMessage(message) {
   return hashHex;
 }
 
-async function generateHash(data, vanity) {
+async function generateHash(data, vanity, difficulty) {
   let finalHash = '';
   let nonce = 0;
+  let target = vanity + '0'.repeat(difficulty);
   let dataHash = await digestMessage(data).then((digestHex) => { return digestHex; });
+
   finalHash = await digestMessage(dataHash + nonce).then((digestHex) => { return digestHex; });
-  while (finalHash.substring(0, vanity.length) !== vanity) {
+  while (finalHash.substring(0, target.length) !== target) {
     nonce += 1;
     finalHash = await digestMessage(dataHash + nonce).then((digestHex) => { return digestHex; });
   }
 
-  return {hash: finalHash, data, dataHash, nonce, sha256input: dataHash + nonce};
+  return {hash: finalHash, difficulty, data, dataHash, nonce, sha256input: dataHash + nonce};
 }
 
 
@@ -27,27 +29,46 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: ''
+      data: '',
+      vanity: '21e8',
+      difficulty: 0
     };
 
     this.computeHash = this.computeHash.bind(this);
-    this.onChange = this.onChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   async computeHash() {
-    let hashObject = await generateHash(this.state.data, '21e8');
+    let hashObject = await generateHash(
+      this.state.data, 
+      this.state.vanity, 
+      this.state.difficulty
+    );
     alert(
       `Hash: ${hashObject.hash}\n\n` +
+      `Difficulty: ${hashObject.difficulty}\n\n` +
       `Data: ${hashObject.data}\n\n` +
       `Data Hash: ${hashObject.dataHash}\n\n` +
       `Nonce: ${hashObject.nonce}\n\n` +
       `SHA-256 input string: ${hashObject.sha256input}`
     );
   }
-
-  onChange(e) {
-    let data = e.target.value;
-    this.setState({ data: data });
+  handleChange(e) {
+    let value = e.target.value;
+    
+    switch (e.target.id) {
+      case 'vanity':
+        this.setState({ vanity: value });
+        break;
+      case 'difficulty':
+        this.setState({ difficulty: value });
+        break;
+      case 'data':
+        this.setState({ data: value });
+        break;
+      default:
+        console.log(`Unknown element: ${e.target}`);
+    }
   }
 
   render() {
@@ -55,7 +76,27 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <h1>Hash Miner</h1>
-          <input type="text" onChange={this.onChange} />
+          <label>Vanity</label>
+          <input 
+            type="text" 
+            id="vanity" 
+            placeholder="Default: 21e8" 
+            onChange={this.handleChange} 
+          />
+          <label for="difficulty">Difficulty</label>
+          <input 
+            type="text" 
+            id="difficulty" 
+            placeholder="Default: 0" 
+            onChange={this.handleChange} 
+          />
+          <label for="data">Data</label>
+          <input 
+            type="text" 
+            id="data" 
+            placeholder="Enter data here..." 
+            onChange={this.handleChange} 
+          />
           <button onClick={this.computeHash}>Compute</button>
         </header>
       </div>
