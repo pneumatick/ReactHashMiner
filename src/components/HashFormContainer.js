@@ -1,6 +1,6 @@
 import React from 'react';
 import HashForm from './HashForm';
-import generateHash from '../scripts/computeHash';
+import { digestMessage, generateHash } from '../scripts/computeHash';
 
 class HashFormContainer extends React.Component {
     constructor(props) {
@@ -8,16 +8,64 @@ class HashFormContainer extends React.Component {
       this.state = {
         vanity: '21e8',
         difficulty: 0,
-        data: ''
+        data: '',
+        avoidDups: false,
+        prevDataHashes: {},
+        computing: false
       };
   
       this.computeHash = this.computeHash.bind(this);
       this.handleChange = this.handleChange.bind(this);
     }
+
+    // Check for duplicate data hashes (not the final vanity hashes).
+    // For "1 hash per data" option.
+    // Return true if the hash is a duplicate, false otherwise.
+    duplicateCheck(dataHash) {
+      let duplicate = false;
+
+      if (Object.hasOwn(this.state.prevDataHashes, dataHash)) {
+        duplicate = true;
+      }
+      else {
+        this.setState((prevState) => {
+          return { prevDataHashes: { ...prevState.prevDataHashes, [dataHash]: 1 } };
+        });
+      }
+
+      return duplicate;
+    }
+
+    // Check for a valid vanity target.
+    // Return true if the vanity target is invalid, false otherwise.
+    invalidHexCheck(vanity) {
+      let invalid = false;
+      Number('0x' + vanity) ? invalid = false : invalid = true;
+      return invalid;
+    }
   
     async computeHash() {
+      this.setState({ computing: true });
+      let dataHash = await digestMessage(this.state.data).then((digestHex) => { return digestHex; });
+
+      // Optional feature to avoid hashing the same data multiple times.
+      //
+      // STATUS: DEFAULT DISABLED AND UNTOGGLEABLE
+      //      
+      // Figure out what to do with this later.
+      if (this.state.avoidDups && this.duplicateCheck(dataHash)) {
+        alert("Duplicate data detected! This data has already been hashed");
+        this.setState({ computing: false });
+        return;
+      }
+      else if (this.invalidHexCheck(this.state.vanity)) {
+        alert("Invalid vanity detected! Enter hex-compatible characters.")
+        this.setState({ computing: false });
+        return;
+      }
+
       let hashObject = await generateHash(
-        this.state.data, 
+        dataHash, 
         this.state.vanity, 
         this.state.difficulty
       );
@@ -30,6 +78,7 @@ class HashFormContainer extends React.Component {
         `SHA-256 input string: ${hashObject.sha256input}`
       );
       this.props.addHash([hashObject.hash, hashObject.sha256input]);
+      this.setState({ computing: false });
     }
 
     handleChange(e) {
@@ -55,6 +104,7 @@ class HashFormContainer extends React.Component {
         <HashForm 
           handleChange={this.handleChange}
           computeHash={this.computeHash}
+          computing={this.state.computing}
         />
       );
     }

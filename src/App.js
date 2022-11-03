@@ -15,12 +15,13 @@ class App extends React.Component {
 
   addHash(newHash) {
     this.setState((prevState) => {
-       return { hashes: [...prevState.hashes, newHash] }
+       return { hashes: [...prevState.hashes, newHash] };
     });
   }
 
+  // Is this necessary?
   componentDidUpdate() {
-    console.log(this.state.hashes);
+    // console.log(this.state.hashes);
   }
 
   render() {

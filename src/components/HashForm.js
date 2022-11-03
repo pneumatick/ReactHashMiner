@@ -25,7 +25,7 @@ class HashForm extends React.Component {
                     placeholder="Enter data here..." 
                     onChange={this.props.handleChange} 
                 />
-                <button onClick={this.props.computeHash}>Compute</button>
+                <button onClick={this.props.computeHash} disabled={this.props.computing}>Compute</button>
             </div>
         );
     }
