@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ReactHashMiner/static/css/main.c5392447.css",
+    "main.js": "/ReactHashMiner/static/js/main.050a6dee.js",
+    "static/js/787.27eb25e1.chunk.js": "/ReactHashMiner/static/js/787.27eb25e1.chunk.js",
+    "index.html": "/ReactHashMiner/index.html",
+    "main.c5392447.css.map": "/ReactHashMiner/static/css/main.c5392447.css.map",
+    "main.050a6dee.js.map": "/ReactHashMiner/static/js/main.050a6dee.js.map",
+    "787.27eb25e1.chunk.js.map": "/ReactHashMiner/static/js/787.27eb25e1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c5392447.css",
+    "static/js/main.050a6dee.js"
+  ]
+}

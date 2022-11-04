@@ -22,7 +22,7 @@ class App extends React.Component {
       if (hashes[dataHash]) { 
         // Check if the vanity has been used previously
         if (hashes[dataHash][vanity]) {
-          let prevNonce = hashes[dataHash][vanity]['prevNonce']
+          let prevNonce = hashes[dataHash][vanity]['prevNonce'];
           let newNonce = prevNonce < nonce ? nonce : prevNonce;
           let newObj = {...hashes[dataHash], [vanity]: {
               'prevNonce': newNonce, 
