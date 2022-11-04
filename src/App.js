@@ -7,21 +7,41 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hashes: []
+      hashes: {}
     }
 
     this.addHash = this.addHash.bind(this);
   }
 
-  addHash(newHash) {
+  // Add a new hash to the 'hashes' state variable
+  addHash(dataHash, vanity, nonce, newHashArray) {
     this.setState((prevState) => {
-       return { hashes: [...prevState.hashes, newHash] };
-    });
-  }
+      let hashes = {...prevState.hashes};
 
-  // Is this necessary?
-  componentDidUpdate() {
-    // console.log(this.state.hashes);
+      // Check if the data has been hashes previously
+      if (hashes[dataHash]) { 
+        // Check if the vanity has been used previously
+        if (hashes[dataHash][vanity]) {
+          let prevNonce = hashes[dataHash][vanity]['prevNonce']
+          let newNonce = prevNonce < nonce ? nonce : prevNonce;
+          let newObj = {...hashes[dataHash], [vanity]: {
+              'prevNonce': newNonce, 
+              'hashes': [...hashes[dataHash][vanity]['hashes'], newHashArray] 
+            } 
+          };
+
+          hashes[dataHash] = newObj;
+        }
+        else {
+          hashes[dataHash][vanity] = { 'prevNonce': nonce, 'hashes': [newHashArray] };
+        }
+      }
+      else {
+        hashes[dataHash] = { [vanity]: { 'prevNonce': nonce, 'hashes': [newHashArray] } };
+      }
+
+      return { hashes: hashes };
+    });
   }
 
   render() {
