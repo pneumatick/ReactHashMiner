@@ -6,9 +6,8 @@ async function digestMessage(message) {
     return hashHex;
 }
 
-async function generateHash(dataHash, vanity, difficulty) {
+async function generateHash(dataHash, vanity, difficulty, nonce = 0) {
     let finalHash = '';
-    let nonce = 0;
     let target = vanity + '0'.repeat(difficulty);
 
     finalHash = await digestMessage(dataHash + nonce).then((digestHex) => { return digestHex; });

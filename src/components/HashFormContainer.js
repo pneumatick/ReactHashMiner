@@ -10,8 +10,7 @@ class HashFormContainer extends React.Component {
         difficulty: 0,
         data: '',
         avoidDups: false,
-        prevDataHashes: {},   // Redundant, remove later
-        computing: false
+        computing: 0
       };
   
       this.computeHash = this.computeHash.bind(this);
@@ -24,7 +23,7 @@ class HashFormContainer extends React.Component {
     duplicateCheck(dataHash) {
       let duplicate = false;
 
-      if (Object.hasOwn(this.state.prevDataHashes, dataHash)) {
+      if (this.props.checkHash(dataHash)) {
         duplicate = true;
       }
       else {
@@ -44,39 +43,36 @@ class HashFormContainer extends React.Component {
       return invalid;
     }
   
-    // NOTE TO SELF: The 'computing' state variable might have to be dealt
-    // with in a more sophisticated manner if/when you allow multiple computations
-    // at the same time.
-    //
-    // 
+    // Compute the vanity hash
     async computeHash() {
       let vanity = this.state.vanity;
       let difficulty = this.state.difficulty;
       let data = this.state.data;
 
-      this.setState({ computing: true });
+      this.setState(prevState => { return { computing: prevState.computing + 1 } });
       let dataHash = await digestMessage(data).then((digestHex) => { return digestHex; });
 
       // Optional feature to avoid hashing the same data multiple times.
       //
-      // STATUS: DEFAULT DISABLED AND UNTOGGLEABLE
+      // STATUS: DISABLED AND UNTOGGLEABLE
       //      
       // 
       if (this.state.avoidDups && this.duplicateCheck(dataHash)) {
         alert("Duplicate data detected! This data has already been hashed");
-        this.setState({ computing: false });
+        this.setState(prevState => { return { computing: prevState.computing - 1 } });
         return;
       }
       else if (this.invalidHexCheck(vanity)) {
         alert("Invalid vanity detected! Enter hex-compatible characters.")
-        this.setState({ computing: false });
+        this.setState(prevState => { return { computing: prevState.computing - 1 } });
         return;
       }
 
       let hashObject = await generateHash(
         dataHash, 
         vanity, 
-        difficulty
+        difficulty,
+        this.props.checkHash(dataHash, vanity) + 1  // Returns prevNonce if it exists
       );
       alert(
         `Hash: ${hashObject.hash}\n\n` +
@@ -86,15 +82,15 @@ class HashFormContainer extends React.Component {
         `SHA-256 input string: ${hashObject.sha256input}`
       );
       this.props.addHash(hashObject.dataHash, vanity, hashObject.nonce, [hashObject.hash, hashObject.sha256input]);
-      this.setState({ computing: false });
+      this.setState(prevState => { return { computing: prevState.computing - 1 } });
     }
 
     handleChange(e) {
-        let value = e.target.value;
+        let value = e.target.value.trim();
         
         switch (e.target.id) {
         case 'vanity':
-            this.setState({ vanity: value.trim() });
+            this.setState({ vanity: value !== '' ? value : '21e8' });
             break;
         case 'difficulty':
             this.setState({ difficulty: value });

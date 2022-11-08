@@ -11,6 +11,7 @@ class App extends React.Component {
     }
 
     this.addHash = this.addHash.bind(this);
+    this.checkHash = this.checkHash.bind(this);
   }
 
   // Add a new hash to the 'hashes' state variable
@@ -18,7 +19,7 @@ class App extends React.Component {
     this.setState((prevState) => {
       let hashes = {...prevState.hashes};
 
-      // Check if the data has been hashes previously
+      // Check if the data has been hashed previously
       if (hashes[dataHash]) { 
         // Check if the vanity has been used previously
         if (hashes[dataHash][vanity]) {
@@ -44,6 +45,21 @@ class App extends React.Component {
     });
   }
 
+  // Check if data has been hashes with a given vanity previously.
+  // Return the previous nonce if it has, otherwise return 0.
+  checkHash(dataHash, vanity) {
+    let nonce = 0;
+
+    try {
+      nonce = this.state.hashes[dataHash][vanity]['prevNonce'];
+    }
+    catch (e) {
+      console.log('New data or vanity: Starting computation from nonce 0');
+    }
+
+    return nonce;
+  }
+
   render() {
     return (
       <div className="App">
@@ -52,6 +68,7 @@ class App extends React.Component {
           <HashFormContainer 
             handleChange={this.handleChange}
             addHash={this.addHash}
+            checkHash={this.checkHash}
           />
           <HashTable hashes={this.state.hashes} />
         </header>
