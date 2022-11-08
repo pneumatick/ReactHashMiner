@@ -1,4 +1,5 @@
 import React from 'react';
+import HashFormHeader from './HashFormHeader';
 import HashForm from './HashForm';
 import { digestMessage, generateHash } from '../scripts/computeHash';
 
@@ -74,23 +75,29 @@ class HashFormContainer extends React.Component {
         difficulty,
         this.props.checkHash(dataHash, vanity) + 1  // Returns prevNonce if it exists
       );
-      alert(
+      /*alert(
         `Hash: ${hashObject.hash}\n\n` +
         `Difficulty: ${hashObject.difficulty}\n\n` +
         `Data Hash: ${hashObject.dataHash}\n\n` +
         `Nonce: ${hashObject.nonce}\n\n` +
         `SHA-256 input string: ${hashObject.sha256input}`
-      );
+      );*/
       this.props.addHash(hashObject.dataHash, vanity, hashObject.nonce, [hashObject.hash, hashObject.sha256input]);
       this.setState(prevState => { return { computing: prevState.computing - 1 } });
     }
 
     handleChange(e) {
-        let value = e.target.value.trim();
+        let value = e.target.value;
         
         switch (e.target.id) {
         case 'vanity':
-            this.setState({ vanity: value !== '' ? value : '21e8' });
+            value = value.trim();
+            if (this.invalidHexCheck(value)) {
+              e.target.value = this.state.vanity;
+            }
+            else {
+              this.setState({ vanity: value !== '' ? value : '21e8' });
+            }
             break;
         case 'difficulty':
             this.setState({ difficulty: value });
@@ -105,11 +112,19 @@ class HashFormContainer extends React.Component {
   
     render() {
       return (
-        <HashForm 
-          handleChange={this.handleChange}
-          computeHash={this.computeHash}
+        <div>
+          <HashFormHeader
+          vanity={this.state.vanity}
+          difficulty={this.state.difficulty}
+          data={this.state.data}
           computing={this.state.computing}
-        />
+          />
+          <HashForm 
+            handleChange={this.handleChange}
+            computeHash={this.computeHash}
+            computing={this.state.computing}
+          />
+        </div>
       );
     }
 }

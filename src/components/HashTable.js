@@ -42,6 +42,7 @@ class HashTable extends React.Component {
 
         return (
             <div className='Hash-table'>
+                <input type="file" accept=".json" onChange={this.props.loadHashFile}></input>
                 <button onClick={this.saveHashesToFile}>Download</button>
                 <table>
                     <thead>

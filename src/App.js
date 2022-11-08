@@ -12,6 +12,7 @@ class App extends React.Component {
 
     this.addHash = this.addHash.bind(this);
     this.checkHash = this.checkHash.bind(this);
+    this.loadHashFile = this.loadHashFile.bind(this);
   }
 
   // Add a new hash to the 'hashes' state variable
@@ -60,6 +61,16 @@ class App extends React.Component {
     return nonce;
   }
 
+  // Load a hash object from a json file
+  loadHashFile(e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = e => {
+      this.setState({ hashes: JSON.parse(e.target.result) });
+    }
+  }
+
   render() {
     return (
       <div className="App">
@@ -70,7 +81,10 @@ class App extends React.Component {
             addHash={this.addHash}
             checkHash={this.checkHash}
           />
-          <HashTable hashes={this.state.hashes} />
+          <HashTable 
+            hashes={this.state.hashes}
+            loadHashFile={this.loadHashFile}
+          />
         </header>
       </div>
     );
