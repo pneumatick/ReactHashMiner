@@ -11,10 +11,16 @@ class HashFormContainer extends React.Component {
         difficulty: 0,
         data: '',
         avoidDups: false,
-        computing: 0
+        computing: 0,
+        iterations: 1,
+        disableVanity: false,
+        disableDifficulty: false,
+        disableData: false,
+        disableRepeat: false
       };
   
-      this.computeHash = this.computeHash.bind(this);
+      this.computeHash = this.computeHash.bind(this);   // Unnecessary?
+      this.computeHashWrapper = this.computeHashWrapper.bind(this);
       this.handleChange = this.handleChange.bind(this);
     }
 
@@ -45,12 +51,12 @@ class HashFormContainer extends React.Component {
     }
   
     // Compute the vanity hash
-    async computeHash() {
-      let vanity = this.state.vanity;
-      let difficulty = this.state.difficulty;
-      let data = this.state.data;
+    async computeHash(vanity, difficulty, data) {
+     //let vanity = this.state.vanity;
+     //let difficulty = this.state.difficulty;
+     //let data = this.state.data;
 
-      this.setState(prevState => { return { computing: prevState.computing + 1 } });
+      //this.setState(prevState => { return { computing: prevState.computing + 1 } });
       let dataHash = await digestMessage(data).then((digestHex) => { return digestHex; });
 
       // Optional feature to avoid hashing the same data multiple times.
@@ -86,33 +92,71 @@ class HashFormContainer extends React.Component {
       this.setState(prevState => { return { computing: prevState.computing - 1 } });
     }
 
+    async computeHashWrapper() {
+      let vanity = this.state.vanity;
+      let difficulty = this.state.difficulty;
+      let data = this.state.data;
+      let iterations = this.state.iterations >= 1 ? this.state.iterations : 0;
+      this.setState(prevState => { return { computing: iterations } });
+      for (let i = 0; i < iterations; i += 1) {
+        await this.computeHash(vanity, difficulty, data);
+      }
+    }
+
     handleChange(e) {
         let value = e.target.value;
         
         switch (e.target.id) {
         case 'vanity':
-            value = value.trim();
-            if (this.invalidHexCheck(value)) {
-              e.target.value = this.state.vanity;
-            }
-            else {
-              this.setState({ vanity: value !== '' ? value : '21e8' });
-            }
-            break;
+          value = value.trim();
+          if (this.invalidHexCheck(value)) {
+            e.target.value = this.state.vanity;
+          }
+          else {
+            this.setState({ vanity: value !== '' ? value : '21e8' });
+          }
+          break;
         case 'difficulty':
-            this.setState({ difficulty: value });
-            break;
+          this.setState({ difficulty: value });
+          break;
         case 'data':
-            this.setState({ data: value });
-            break;
+          this.setState({ data: value });
+          break;
+        case 'repeat':
+          this.setState({ iterations: Number(value) + 1 });
+          break;
+        case 'disableVanity':
+          this.setState({ 
+            disableVanity: !this.state.disableVanity, 
+            vanity: !this.state.disableVanity ? '' : document.getElementById('vanity').value || '21e8'
+          });
+          break;
+        case 'disableDifficulty':
+          this.setState({ 
+            disableDifficulty: !this.state.disableDifficulty, 
+            difficulty: !this.state.disableDifficulty ? '' : document.getElementById('difficulty').value || 0
+          });
+          break;
+        case 'disableData':
+          this.setState({ 
+            disableData: !this.state.disableData, 
+            data: !this.state.disableData ? '' : document.getElementById('data').value || ''
+          });
+          break;
+        case 'disableRepeat':
+          this.setState({ 
+            disableRepeat: !this.state.disableRepeat, 
+            iterations: !this.state.disableRepeat ? 1 : Number(document.getElementById('repeat').value) + 1 || 1
+          });
+          break;
         default:
-            console.log(`Unknown element: ${e.target}`);
+          console.log(`Unknown element: ${e.target}`);
         }
     }
   
     render() {
       return (
-        <div>
+        <div className='Hash-form-container'>
           <HashFormHeader
           vanity={this.state.vanity}
           difficulty={this.state.difficulty}
@@ -121,8 +165,12 @@ class HashFormContainer extends React.Component {
           />
           <HashForm 
             handleChange={this.handleChange}
-            computeHash={this.computeHash}
+            computeHash={this.computeHashWrapper}
             computing={this.state.computing}
+            disableVanity={this.state.disableVanity}
+            disableDifficulty={this.state.disableDifficulty}
+            disableData={this.state.disableData}
+            disableRepeat={this.state.disableRepeat}
           />
         </div>
       );

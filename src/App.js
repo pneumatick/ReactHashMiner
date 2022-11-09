@@ -76,16 +76,16 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <h1>Hash Miner</h1>
-          <HashFormContainer 
-            handleChange={this.handleChange}
-            addHash={this.addHash}
-            checkHash={this.checkHash}
-          />
-          <HashTable 
-            hashes={this.state.hashes}
-            loadHashFile={this.loadHashFile}
-          />
         </header>
+        <HashFormContainer 
+          handleChange={this.handleChange}
+          addHash={this.addHash}
+          checkHash={this.checkHash}
+        />
+        <HashTable 
+          hashes={this.state.hashes}
+          loadHashFile={this.loadHashFile}
+        />
       </div>
     );
   }

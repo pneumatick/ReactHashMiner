@@ -47,13 +47,13 @@ class HashTable extends React.Component {
                 <table>
                     <thead>
                         <tr>
-                            <td className='id'>ID</td>
+                            <td className='id'>#</td>
                             <td>Hash</td>
                             <td>Input (data hash + nonce)</td>
                         </tr>
                     </thead>
                     <tbody>
-                        {listedHashes}
+                        {listedHashes.reverse()}
                     </tbody>
                 </table>
             </div>

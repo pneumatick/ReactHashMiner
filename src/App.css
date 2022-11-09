@@ -3,8 +3,9 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  /*background-color: #282c34;*/
+  background-color: black;
+  min-height: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,8 +14,39 @@
   color: white;
 }
 
+.Hash-form-container {
+  margin: 48px 25vw;
+  width: 50vw;
+}
+
+.Hash-form-header {
+  
+}
+
+.Hash-form, .Hash-input-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.Hash-input-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.Hash-input-disable {
+  display: flex;
+  width: 100%;
+}
+
+.Hash-checkbox {
+  margin: 0 6px 0 0;
+}
+
 .Hash-table {
-  width: 75%;
+  margin: 0 5vw;
+  width: 90vw;
 }
 
 .id {

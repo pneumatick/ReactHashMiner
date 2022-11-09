@@ -8,7 +8,7 @@ class HashFormHeader extends React.Component {
         super(props);
 
         this.state = { 
-            fakeHex: '', 
+            fakeHex: 'placeholder', 
             interval: '' 
         };
     }
@@ -32,19 +32,26 @@ class HashFormHeader extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        clearInterval(this.state.interval);
+    }
+
     render() {
-        let diffRep = '0'.repeat(this.props.difficulty);
+        let diffRep = '0'.repeat(this.props.difficulty >= 0 ? this.props.difficulty : 0);
         let computing = this.props.computing
-        let showWhenComputing = {display: this.props.computing ? 'block' : 'none'};
+        //let showWhenComputing = {display: this.props.computing ? 'block' : 'none'};
+        let showWhenComputing = {
+            visibility: this.props.computing ? 'visible' : 'hidden'
+        };
         let hexColor = '#' + this.state.fakeHex.substring(0, 6);
 
         return (
             <div className='Hash-form-header'>
                 <p>Target: {this.props.vanity}{diffRep}...</p>
-                <p style={showWhenComputing}>{computing} hash{computing !== 1 ? 'es' : ''} in progress:</p>
                 <p style={showWhenComputing}>
                     <span style={{ color: hexColor }}>{this.state.fakeHex}</span>
                 </p>
+                <p>{computing} hash{computing !== 1 ? 'es' : ''} in progress</p>
             </div>
         );
     }
