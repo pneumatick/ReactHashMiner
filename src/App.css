@@ -3,7 +3,6 @@
 }
 
 .App-header {
-  /*background-color: #282c34;*/
   background-color: black;
   min-height: 20vh;
   display: flex;
@@ -15,12 +14,10 @@
 }
 
 .Hash-form-container {
-  margin: 48px 25vw;
+  margin: 0 25vw;
+  padding-bottom: 24px;
   width: 50vw;
-}
-
-.Hash-form-header {
-  
+  border-bottom: 1px solid black;
 }
 
 .Hash-form, .Hash-input-div {
@@ -51,4 +48,11 @@
 
 .id {
   width: 5%;
+}
+
+@media only screen and (max-width: 1335px) {
+  .Hash-input-row, .Hash-input-div {
+    flex-direction: column;
+    align-items: center;
+  }
 }

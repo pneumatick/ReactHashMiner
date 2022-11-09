@@ -13,6 +13,10 @@ class HashFormHeader extends React.Component {
         };
     }
 
+    // Create a pseudo-hash for aesthetic purposes, as well as
+    // to provide feedback to the user relating to hash computation.
+    // The hex string doesn't represent real data. All characters are
+    // randomly generated, with a new string being generated every interval.
     componentDidUpdate() {
         if (this.props.computing && !this.state.interval) {
             let interval = setInterval(() => {
@@ -32,6 +36,7 @@ class HashFormHeader extends React.Component {
         }
     }
 
+    // Ensure the interval is cleared to prevent memory leaks.
     componentWillUnmount() {
         clearInterval(this.state.interval);
     }
@@ -39,7 +44,6 @@ class HashFormHeader extends React.Component {
     render() {
         let diffRep = '0'.repeat(this.props.difficulty >= 0 ? this.props.difficulty : 0);
         let computing = this.props.computing
-        //let showWhenComputing = {display: this.props.computing ? 'block' : 'none'};
         let showWhenComputing = {
             visibility: this.props.computing ? 'visible' : 'hidden'
         };
@@ -47,11 +51,13 @@ class HashFormHeader extends React.Component {
 
         return (
             <div className='Hash-form-header'>
-                <p>Target: {this.props.vanity}{diffRep}...</p>
+                <h2>Target: {this.props.vanity}{diffRep}...</h2>
                 <p style={showWhenComputing}>
                     <span style={{ color: hexColor }}>{this.state.fakeHex}</span>
                 </p>
-                <p>{computing} hash{computing !== 1 ? 'es' : ''} in progress</p>
+                <p style={showWhenComputing}>
+                    {computing} hash{computing !== 1 ? 'es' : ''} in progress
+                </p>
             </div>
         );
     }

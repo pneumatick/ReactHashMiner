@@ -52,23 +52,17 @@ class HashFormContainer extends React.Component {
   
     // Compute the vanity hash
     async computeHash(vanity, difficulty, data) {
-     //let vanity = this.state.vanity;
-     //let difficulty = this.state.difficulty;
-     //let data = this.state.data;
-
-      //this.setState(prevState => { return { computing: prevState.computing + 1 } });
       let dataHash = await digestMessage(data).then((digestHex) => { return digestHex; });
 
       // Optional feature to avoid hashing the same data multiple times.
       //
       // STATUS: DISABLED AND UNTOGGLEABLE
-      //      
-      // 
       if (this.state.avoidDups && this.duplicateCheck(dataHash)) {
         alert("Duplicate data detected! This data has already been hashed");
         this.setState(prevState => { return { computing: prevState.computing - 1 } });
         return;
       }
+      // Ensure the vanity is valid to avoid infinite computation
       else if (this.invalidHexCheck(vanity)) {
         alert("Invalid vanity detected! Enter hex-compatible characters.")
         this.setState(prevState => { return { computing: prevState.computing - 1 } });
@@ -81,7 +75,8 @@ class HashFormContainer extends React.Component {
         difficulty,
         this.props.checkHash(dataHash, vanity) + 1  // Returns prevNonce if it exists
       );
-      /*alert(
+      /*// For testing; leave just in case you want it later
+      alert(
         `Hash: ${hashObject.hash}\n\n` +
         `Difficulty: ${hashObject.difficulty}\n\n` +
         `Data Hash: ${hashObject.dataHash}\n\n` +
@@ -103,54 +98,56 @@ class HashFormContainer extends React.Component {
       }
     }
 
+    // This could be broken up into two functions.
+    // One for text inputs, the other for checkbox inputs.
     handleChange(e) {
         let value = e.target.value;
         
         switch (e.target.id) {
-        case 'vanity':
-          value = value.trim();
-          if (this.invalidHexCheck(value)) {
-            e.target.value = this.state.vanity;
-          }
-          else {
-            this.setState({ vanity: value !== '' ? value : '21e8' });
-          }
-          break;
-        case 'difficulty':
-          this.setState({ difficulty: value });
-          break;
-        case 'data':
-          this.setState({ data: value });
-          break;
-        case 'repeat':
-          this.setState({ iterations: Number(value) + 1 });
-          break;
-        case 'disableVanity':
-          this.setState({ 
-            disableVanity: !this.state.disableVanity, 
-            vanity: !this.state.disableVanity ? '' : document.getElementById('vanity').value || '21e8'
-          });
-          break;
-        case 'disableDifficulty':
-          this.setState({ 
-            disableDifficulty: !this.state.disableDifficulty, 
-            difficulty: !this.state.disableDifficulty ? '' : document.getElementById('difficulty').value || 0
-          });
-          break;
-        case 'disableData':
-          this.setState({ 
-            disableData: !this.state.disableData, 
-            data: !this.state.disableData ? '' : document.getElementById('data').value || ''
-          });
-          break;
-        case 'disableRepeat':
-          this.setState({ 
-            disableRepeat: !this.state.disableRepeat, 
-            iterations: !this.state.disableRepeat ? 1 : Number(document.getElementById('repeat').value) + 1 || 1
-          });
-          break;
-        default:
-          console.log(`Unknown element: ${e.target}`);
+          case 'vanity':
+            value = value.trim();
+            if (this.invalidHexCheck(value)) {
+              e.target.value = this.state.vanity;
+            }
+            else {
+              this.setState({ vanity: value !== '' ? value : '21e8' });
+            }
+            break;
+          case 'difficulty':
+            this.setState({ difficulty: value });
+            break;
+          case 'data':
+            this.setState({ data: value });
+            break;
+          case 'repeat':
+            this.setState({ iterations: Number(value) + 1 });
+            break;
+          case 'disableVanity':
+            this.setState({ 
+              disableVanity: !this.state.disableVanity, 
+              vanity: !this.state.disableVanity ? '' : document.getElementById('vanity').value || '21e8'
+            });
+            break;
+          case 'disableDifficulty':
+            this.setState({ 
+              disableDifficulty: !this.state.disableDifficulty, 
+              difficulty: !this.state.disableDifficulty ? '' : document.getElementById('difficulty').value || 0
+            });
+            break;
+          case 'disableData':
+            this.setState({ 
+              disableData: !this.state.disableData, 
+              data: !this.state.disableData ? '' : document.getElementById('data').value || ''
+            });
+            break;
+          case 'disableRepeat':
+            this.setState({ 
+              disableRepeat: !this.state.disableRepeat, 
+              iterations: !this.state.disableRepeat ? 1 : Number(document.getElementById('repeat').value) + 1 || 1
+            });
+            break;
+          default:
+            console.log(`Unexpected element: ${e.target}`);
         }
     }
   
